@@ -10,6 +10,9 @@ Run the following command:
 npx create-turbo@latest
 ```
 
+## figma
+``` https://www.figma.com/design/rbMDyYZOI9N7VHgXGTWE9M/Nourane?node-id=0-1&p=f&t=HXJQMiEG5aFL632u-0 ```
+
 ## What's inside?
 
 This Turborepo includes the following packages/apps:
