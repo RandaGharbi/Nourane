@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import CartItemRow from "../components/CartItemRow";
-import GoBackIcon from '../assets/images/back.png';
+import CartItemRow from "../../components/CartItemRow";
+import GoBackIcon from '../../assets/images/back.png';
 import { useRouter } from 'expo-router';
-import { useCart } from "../context/CartContext";
-import { useAuth } from '../context/AuthContext';
+import { useCart } from "../../context/CartContext";
+import { useAuth } from '../../context/AuthContext';
 import { Swipeable } from 'react-native-gesture-handler';
 
 const CartScreen: React.FC = () => {
@@ -107,7 +107,10 @@ const CartScreen: React.FC = () => {
       />
 
       {/* Checkout Button en bas */}
-      <TouchableOpacity style={styles.checkoutBtn}>
+      <TouchableOpacity
+        style={styles.checkoutBtn}
+        onPress={() => router.push('/checkout')}
+      >
         <Text style={styles.checkoutText}>Checkout</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -173,15 +176,13 @@ const styles = StyleSheet.create({
   },
   totalText: { fontSize: 13 },
   checkoutBtn: {
-    backgroundColor: "#F5A623",
+    backgroundColor: "#F2910D",
     borderRadius: 25,
-    padding: 10,
-    marginTop: 16,
+    padding: 14,
+    marginBottom: 70,
     alignItems: "center",
-    marginBottom: 16,
-    marginHorizontal: 15,
+    marginHorizontal: 16,
   },
   checkoutText: { color: "#000", fontWeight: "bold", fontSize: 16 },
 });
-
 export default CartScreen;

@@ -38,7 +38,6 @@ const ShopScreen: React.FC = () => {
         price: item.price,
         volume: item.subtitle,
       });
-      router.push('/cart');
     } else {
       router.push('/login');
     }

@@ -12,6 +12,9 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import SocialButton from "../components/SocialButton";
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
 
 import appleIcon from "../assets/images/apple.png";
 import googleIcon from "../assets/images/gmail.png";
@@ -24,6 +27,32 @@ const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  WebBrowser.maybeCompleteAuthSession();
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: 'TON_CLIENT_ID_WEB.apps.googleusercontent.com', // Pour Expo Go OU build, adapte selon ton usage
+    iosClientId: 'TON_CLIENT_ID_IOS.apps.googleusercontent.com',   // Pour build iOS
+    androidClientId: 'TON_CLIENT_ID_ANDROID.apps.googleusercontent.com', // Pour build Android
+  });
+
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      const idToken = response.authentication?.idToken;
+      if (idToken) {
+        fetch('http://localhost:5000/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: idToken }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            // Ici, gère la connexion (stocke le JWT, etc.)
+            // Par exemple : login(data.token, data.user)
+          });
+      }
+    }
+  }, [response]);
 
   // Rediriger si déjà connecté
   useEffect(() => {
@@ -44,6 +73,40 @@ const LoginScreen: React.FC = () => {
     
     if (res) {
       router.replace('/');
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+      if (credential.identityToken) {
+        console.log('identityToken Apple:', credential.identityToken);
+        // Envoie le token au backend
+        const res = await fetch('http://localhost:5000/api/auth/apple', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: credential.identityToken }),
+        });
+        const data = await res.json();
+        if (data.token) {
+          // Ici tu peux stocker le token JWT et connecter l'utilisateur
+          // Par exemple : await loginWithApple(data.token, data.user)
+          // Ou rediriger, etc.
+        } else {
+          Alert.alert('Erreur', data.error || 'Erreur lors de la connexion Apple');
+        }
+      }
+    } catch (e) {
+      if (e.code === 'ERR_CANCELED') {
+        // L'utilisateur a annulé
+      } else {
+        Alert.alert('Erreur', 'Erreur lors de la connexion Apple');
+      }
     }
   };
 
@@ -86,12 +149,12 @@ const LoginScreen: React.FC = () => {
         <SocialButton
           icon={appleIcon}
           text="Continue with Apple"
-          onPress={() => {}}
+          onPress={handleAppleLogin}
         />
         <SocialButton
           icon={googleIcon}
           text="Continue with Google"
-          onPress={() => {}}
+          onPress={() => promptAsync()}
         />
         <SocialButton
           icon={emailIcon}
@@ -103,7 +166,7 @@ const LoginScreen: React.FC = () => {
       </View>
 
       {showEmailForm && (
-        <View style={{ marginTop: 24 }}>
+        <View style={{ marginTop: 24, paddingHorizontal: 24 }}>
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
@@ -185,6 +248,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 32,
+    paddingHorizontal: 24,
   },
   emailButton: {
     backgroundColor: "#F5A623",

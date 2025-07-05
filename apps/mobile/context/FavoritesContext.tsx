@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Product = {
-  id: number;
+  uniqueId: string;
   title: string;
   subtitle?: string;
   price: number;
@@ -11,7 +11,7 @@ type Product = {
 type FavoritesContextType = {
   favorites: Product[];
   toggleFavorite: (product: Product) => void;
-  isFavorite: (productId: number) => boolean;
+  isFavorite: (productUniqueId: string) => boolean;
 };
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -21,13 +21,13 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
 
   const toggleFavorite = (product: Product) => {
     setFavorites((prev) =>
-      prev.some((p) => p.id === product.id)
-        ? prev.filter((p) => p.id !== product.id)
+      prev.some((p) => p.uniqueId === product.uniqueId)
+        ? prev.filter((p) => p.uniqueId !== product.uniqueId)
         : [...prev, product]
     );
   };
 
-  const isFavorite = (productId: number) => favorites.some((p) => p.id === productId);
+  const isFavorite = (productUniqueId: string) => favorites.some((p) => p.uniqueId === productUniqueId);
 
   return (
     <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite }}>

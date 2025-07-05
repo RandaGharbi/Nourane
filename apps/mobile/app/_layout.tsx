@@ -13,18 +13,18 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-      <FavoritesProvider>
-        <CartProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-            </Stack>
-            <StatusBar style="auto" />
-          </ThemeProvider>
-        </CartProvider>
-      </FavoritesProvider>
-      </AuthProvider>
+    <AuthProvider>
+    <FavoritesProvider>
+      <CartProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </CartProvider>
+    </FavoritesProvider>
+    </AuthProvider>
     </GestureHandlerRootView>
   );
 }
