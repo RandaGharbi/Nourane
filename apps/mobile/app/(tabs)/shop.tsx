@@ -29,8 +29,15 @@ const ShopScreen: React.FC = () => {
   
   const router = useRouter();
   
-  const handleBasketPress = () => {
+  const handleBasketPress = (item: any) => {
     if (isAuthenticated) {
+      addToCart({
+        id: item.uniqueId,
+        name: item.title,
+        image: item.image_url,
+        price: item.price,
+        volume: item.subtitle,
+      });
       router.push('/cart');
     } else {
       router.push('/login');
@@ -94,16 +101,7 @@ const ShopScreen: React.FC = () => {
             product={item}
             isFavorite={isFavorite(item.uniqueId)}
             onToggleFavorite={() => toggleFavorite(item)}
-            onPressBasket={() => {
-              addToCart({
-                id: item.uniqueId,
-                name: item.title,
-                image: item.image_url,
-                price: item.price,
-                volume: item.subtitle,
-              });
-              router.push('/cart');
-            }}
+            onPressBasket={() => handleBasketPress(item)}
           />
         )}
         columnWrapperStyle={styles.row}

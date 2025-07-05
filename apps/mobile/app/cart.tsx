@@ -12,10 +12,20 @@ import CartItemRow from "../components/CartItemRow";
 import GoBackIcon from '../assets/images/back.png';
 import { useRouter } from 'expo-router';
 import { useCart } from "../context/CartContext";
+import { useAuth } from '../context/AuthContext';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const CartScreen: React.FC = () => {
-  const { cart, updateQuantity } = useCart();
+  const { cart, updateQuantity, removeFromCart } = useCart();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
+
+  // Redirige si non connecté
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/'); // ou '/login'
+    }
+  }, [isAuthenticated, router]);
 
   const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -65,10 +75,30 @@ const CartScreen: React.FC = () => {
         data={cart}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <CartItemRow
-            item={item}
-            onChangeQuantity={(delta) => updateQuantity(item.id, delta)}
-          />
+          <Swipeable
+            renderRightActions={() => (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#FF4D4F',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: 80,
+                  height: '90%',
+                  borderRadius: 10,
+                  marginVertical: 5,
+                }}
+                onPress={() => removeFromCart(item.id)}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>Supprimer</Text>
+              </TouchableOpacity>
+            )}
+          >
+            <CartItemRow
+              item={item}
+              onChangeQuantity={(delta) => updateQuantity(item.id, delta)}
+              onDelete={() => removeFromCart(item.id)}
+            />
+          </Swipeable>
         )}
         style={{ marginTop: 8 }}
         ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}

@@ -19,7 +19,7 @@ import emailIcon from "../assets/images/email.png";
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
-  const { login, isAuthenticated, loading } = useAuth();
+  const { login, isAuthenticated, loading, user, setUser } = useAuth();
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,10 +39,10 @@ const LoginScreen: React.FC = () => {
     }
     
     setIsLoggingIn(true);
-    const ok = await login(email, password);
+    const res = await login(email, password);
     setIsLoggingIn(false);
     
-    if (ok) {
+    if (res) {
       router.replace('/');
     }
   };

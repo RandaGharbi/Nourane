@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 
 type CartItem = {
-  id: string;
+  id: string | number;
   name: string;
   volume: string;
   image: string;
@@ -13,9 +13,10 @@ type CartItem = {
 type Props = {
   item: CartItem;
   onChangeQuantity: (delta: number) => void;
+  onDelete?: () => void;
 };
 
-const CartItemRow: React.FC<Props> = ({ item, onChangeQuantity }) => (
+const CartItemRow: React.FC<Props> = ({ item, onChangeQuantity, onDelete }) => (
   <View style={styles.itemRow}>
     <Image source={{ uri: item.image }} style={styles.image} />
     <View style={{ flex: 1 }}>
@@ -24,7 +25,13 @@ const CartItemRow: React.FC<Props> = ({ item, onChangeQuantity }) => (
     </View>
     <View style={styles.quantityContainer}>
       <TouchableOpacity
-        onPress={() => onChangeQuantity(-1)}
+        onPress={() => {
+          if (item.quantity === 1 && onDelete) {
+            onDelete();
+          } else {
+            onChangeQuantity(-1);
+          }
+        }}
         style={styles.qtyBtn}
       >
         <Text style={styles.qtyBtnText}>-</Text>

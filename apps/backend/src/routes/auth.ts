@@ -61,4 +61,25 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/me', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: 'No token' });
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as jwt.JwtPayload;
+    const userId = typeof decoded === 'object' && decoded.userId ? decoded.userId : null;
+    if (!userId) return res.status(401).json({ message: 'Invalid token payload' });
+    const user = await User.findById(userId).select('name email');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+});
+
+router.post('/logout', (req, res) => {
+  res.json({ message: 'Déconnexion réussie' });
+});
+
 export default router;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,29 +9,44 @@ import {
 } from 'react-native';
 
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../context/AuthContext';
 
 import BackIcon from '../../assets/images/back.png';
 import ChevronIcon from '../../assets/images/chevron.png';
 import AvatarImage from '../../assets/images/avatar.png';
+import LogoutIcon from '../../assets/images/logout.png';
 
 export default function ProfileScreen() {
+  const { isAuthenticated, user, logout } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated]);
+
   const handleNavigation = (screen: string) => {
-    router.push(`/${screen}`);
+    router.push(`/${screen}` as any);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Pressable style={styles.backButton} onPress={() => router.back()}>
-        <Image source={BackIcon} style={styles.icon} />
-      </Pressable>
-
-      <Text style={styles.pageTitle}>Profile</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.pageTitle}>Profile</Text>
+        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+          <Image source={LogoutIcon} style={styles.logoutIcon} />
+        </Pressable>
+      </View>
 
       <Image source={AvatarImage} style={styles.avatar} />
-      <Text style={styles.name}>Aisha</Text>
-      <Text style={styles.email}>aisha.k@email.com</Text>
+      <Text style={styles.name}>{user?.name || "Nom inconnu"}</Text>
+      <Text style={styles.email}>{user?.email || "Email inconnu"}</Text>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
@@ -80,24 +95,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     flexGrow: 1,
   },
-  backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 10,
-  },
-  icon: {
-    width: 18,
-    height: 18,
-    resizeMode: 'contain',
-    tintColor: '#000',
-    marginTop: 19,
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 35,
+    marginTop: 0,
   },
   pageTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 35,
+    flex: 1,
   },
   avatar: {
     width: 100,
@@ -140,4 +149,14 @@ const styles = StyleSheet.create({
     tintColor: '#000',
     resizeMode: 'contain',
   },
-});
+  logoutButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
+  logoutIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
+    tintColor: '#000',
+  },
+}); 

@@ -12,6 +12,7 @@ import favoritesIconActive from "../assets/images/activeFavorites.png";
 import basket from "../assets/images/basket.png";
 import goBackIcon from "../assets/images/back.png";
 import { useFavorites } from "../context/FavoritesContext";
+import { useRouter } from "expo-router";
 
 type Product = {
   id: number;
@@ -34,6 +35,23 @@ const ProductItem: React.FC<ProductItemProps> = ({
   onToggleFavorite,
   onPressBasket
 }) => {
+  const router = useRouter();
+
+  const handleBasketPress = (item) => {
+    if (isAuthenticated) {
+      addToCart({
+        id: item.uniqueId,
+        name: item.title,
+        image: item.image_url,
+        price: item.price,
+        volume: item.subtitle,
+      });
+      router.push('/cart');
+    } else {
+      router.push('/login');
+    }
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
